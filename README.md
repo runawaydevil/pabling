@@ -10,7 +10,7 @@ npm install
 
 Opcional: `.env` com `GEMINI_API_KEY` se for usar API.
 
-**Dev:** `npm run dev` (porta 3589)
+**Dev:** `npm run dev` (porta 8761)
 
 **Build:** `npm run build` → gera `dist/`
 

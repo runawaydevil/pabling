@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(__dirname, 'dist');
-const PORT = Number(process.env.PORT) || 3589;
+const PORT = Number(process.env.PORT) || 8761;
 
 const app = express();
 app.use(express.static(dist));

@@ -1,155 +1,41 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Folder, Globe, Trash2, Gamepad2, Music, FileText, Terminal } from 'lucide-react';
 
-// --- Snake Game Component ---
-const GRID_SIZE = 20;
-const INITIAL_SNAKE = [{ x: 10, y: 10 }];
-const INITIAL_DIRECTION = { x: 0, y: -1 };
-
-function SnakeGame() {
-  const [snake, setSnake] = useState(INITIAL_SNAKE);
-  const [food, setFood] = useState({ x: 15, y: 5 });
-  const [gameOver, setGameOver] = useState(false);
-  const [score, setScore] = useState(0);
+// --- Vaporwave Game Component ---
+function VaporwaveGame() {
   const [isPlaying, setIsPlaying] = useState(false);
-  
-  const directionRef = useRef(INITIAL_DIRECTION);
-
-  const resetGame = () => {
-    setSnake(INITIAL_SNAKE);
-    directionRef.current = INITIAL_DIRECTION;
-    setFood({ x: Math.floor(Math.random() * GRID_SIZE), y: Math.floor(Math.random() * GRID_SIZE) });
-    setGameOver(false);
-    setScore(0);
-    setIsPlaying(true);
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isPlaying) return;
-      
-      switch (e.key) {
-        case 'ArrowUp':
-          if (directionRef.current.y !== 1) directionRef.current = { x: 0, y: -1 };
-          break;
-        case 'ArrowDown':
-          if (directionRef.current.y !== -1) directionRef.current = { x: 0, y: 1 };
-          break;
-        case 'ArrowLeft':
-          if (directionRef.current.x !== 1) directionRef.current = { x: -1, y: 0 };
-          break;
-        case 'ArrowRight':
-          if (directionRef.current.x !== -1) directionRef.current = { x: 1, y: 0 };
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying]);
-
-  useEffect(() => {
-    if (!isPlaying || gameOver) return;
-
-    const moveSnake = () => {
-      setSnake(prev => {
-        const head = prev[0];
-        const newHead = { 
-          x: head.x + directionRef.current.x, 
-          y: head.y + directionRef.current.y 
-        };
-
-        // Wall collision
-        if (newHead.x < 0 || newHead.x >= GRID_SIZE || newHead.y < 0 || newHead.y >= GRID_SIZE) {
-          setGameOver(true);
-          setIsPlaying(false);
-          return prev;
-        }
-
-        // Self collision
-        if (prev.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
-          setGameOver(true);
-          setIsPlaying(false);
-          return prev;
-        }
-
-        const newSnake = [newHead, ...prev];
-
-        // Food collision
-        if (newHead.x === food.x && newHead.y === food.y) {
-          setScore(s => s + 10);
-          setFood({
-            x: Math.floor(Math.random() * GRID_SIZE),
-            y: Math.floor(Math.random() * GRID_SIZE)
-          });
-        } else {
-          newSnake.pop();
-        }
-
-        return newSnake;
-      });
-    };
-
-    const intervalId = setInterval(moveSnake, 120);
-    return () => clearInterval(intervalId);
-  }, [food, isPlaying, gameOver]);
 
   return (
-    <div className="flex flex-col items-center font-pixel">
+    <div className="flex flex-col items-center font-pixel w-[500px]">
       <div className="w-full flex justify-between mb-2 text-black text-xl">
-        <span>SCORE: {score}</span>
-        <span>HI-SCORE: 9999</span>
+        <span>OUTRUN_VAPOR.EXE</span>
+        <span>1986</span>
       </div>
-      
-      <div 
-        className="win95-inset relative bg-black"
-        style={{ width: 300, height: 300 }}
-      >
-        {!isPlaying && !gameOver && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-10">
-            <button onClick={resetGame} className="win95-button text-xl px-4 py-2">
-              START GAME
+      <div className="win95-inset relative bg-black w-full h-[350px] overflow-hidden">
+        {!isPlaying ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 z-10">
+            <h2 className="text-[#ff00ff] text-3xl mb-4 drop-shadow-[0_0_5px_#ff00ff]">VIRTUAL PLAZA</h2>
+            <button onClick={() => setIsPlaying(true)} className="win95-button text-xl px-4 py-2">
+              ENTER SIMULATION
             </button>
           </div>
+        ) : (
+          <iframe 
+            src="https://archive.org/embed/arcade_outrun?autoplay=1" 
+            width="100%" 
+            height="100%" 
+            frameBorder="0" 
+            allowFullScreen
+            className="w-full h-full"
+            style={{ filter: 'hue-rotate(30deg) saturate(1.5) contrast(1.1)' }}
+          ></iframe>
         )}
-        
-        {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-10 text-red-500">
-            <h2 className="text-3xl mb-4 animate-pulse">GAME OVER</h2>
-            <button onClick={resetGame} className="win95-button text-xl px-4 py-2">
-              TRY AGAIN
-            </button>
-          </div>
-        )}
-
-        {/* Render Food */}
-        <div 
-          className="absolute bg-magenta-500 shadow-[0_0_8px_#ff00ff]"
-          style={{
-            width: 300 / GRID_SIZE,
-            height: 300 / GRID_SIZE,
-            left: food.x * (300 / GRID_SIZE),
-            top: food.y * (300 / GRID_SIZE),
-            backgroundColor: '#ff00ff'
-          }}
-        />
-
-        {/* Render Snake */}
-        {snake.map((segment, index) => (
-          <div 
-            key={index}
-            className="absolute bg-cyan-400 border border-cyan-600 shadow-[0_0_5px_#00ffff]"
-            style={{
-              width: 300 / GRID_SIZE,
-              height: 300 / GRID_SIZE,
-              left: segment.x * (300 / GRID_SIZE),
-              top: segment.y * (300 / GRID_SIZE),
-              backgroundColor: index === 0 ? '#ffffff' : '#00ffff'
-            }}
-          />
-        ))}
       </div>
-      <p className="mt-2 text-sm text-gray-700 text-center leading-tight">Use Arrow Keys to move.<br/>Avoid walls and yourself.</p>
+      <p className="mt-2 text-sm text-gray-700 text-center leading-tight">
+        Powered by Archive.org<br/>
+        Click inside to focus. Press '5' to insert coin, '1' to start.<br/>
+        Arrows to drive, Z/X for pedals.
+      </p>
     </div>
   );
 }
@@ -260,7 +146,7 @@ function Desktop() {
   // Window Management State
   const [topZ, setTopZ] = useState(30);
   const [windows, setWindows] = useState<Record<string, WindowState>>({
-    arcade: { isOpen: true, z: 20, x: 350, y: 100 },
+    arcade: { isOpen: true, z: 20, x: 250, y: 50 },
     winamp: { isOpen: true, z: 21, x: 50, y: 400 },
     projetos: { isOpen: false, z: 0, x: 100, y: 100 },
     internet: { isOpen: false, z: 0, x: 150, y: 150 },
@@ -386,9 +272,9 @@ function Desktop() {
       </DraggableWindow>
 
       {/* Game Window */}
-      <DraggableWindow id="arcade" title="Pabl.ING_arcade.exe" windowState={windows.arcade} focusWindow={focusWindow} closeWindow={closeWindow}>
+      <DraggableWindow id="arcade" title="Vapor_World.exe" windowState={windows.arcade} focusWindow={focusWindow} closeWindow={closeWindow}>
         <div className="p-2">
-          <SnakeGame />
+          <VaporwaveGame />
         </div>
       </DraggableWindow>
 
